@@ -1,74 +1,43 @@
-import { ADD_TODO, TOGGLE_TODO, DELETE_TODO } from "../actions/types/todo";
+import {
+  // ADD_TODO,
+  // TOGGLE_TODO,
+  FETCH_TODOS_STARTED,
+  FETCH_TODOS_SUCCESS,
+  FETCH_TODOS_FAILURE,
+} from "../actions/types/todo";
 
-// 1.
 const initialState = {
-  allIds: [],
-  byIds: {},
-};
+  loading: false,
+  error: null,
+  todos: [],
+}
 
-// 2.
 export default function todoReducer(state = initialState, action) {
   switch (action.type) {
-    // 3.
-    case ADD_TODO: {
-      // 4.
-      const { id, content } = action.payload;
-
-      // 5.
+    case FETCH_TODOS_STARTED: {
       return {
         ...state,
-
-        allIds: [...state.allIds, id],
-
-        byIds: {
-          ...state.byIds,
-
-          [id]: {
-            content,
-            complete: false,
-          },
-        },
+        loading: true,
       };
     }
 
-    case TOGGLE_TODO: {
-      const { id } = action.payload;
-
-      const targetTodo = state.byIds[id];
-
+    case FETCH_TODOS_SUCCESS: {
       return {
         ...state,
-
-        byIds: {
-          ...state.byIds,
-          [id]: {
-            ...targetTodo,
-            completed: !targetTodo.completed,
-          },
-        },
+        loading: false,
+        error: null,
+        todos: [...action.payload.todos],
       };
-
     }
 
-    case DELETE_TODO: {
-      const { id } = action.payload
-
-      const filteredTodo = [...state.allIds].filter((todoItemId) => {
-        return todoItemId !== id
-    })
-
-    return {
+    case FETCH_TODOS_FAILURE:
+      return {
         ...state,
+        loading: false,
+        error: action.payload.error,
+      };    
 
-        allIds: filteredTodo,
-
-        byIds: {
-            ...state.byIds,
-        },
-    }
-}
-
-default:
-    return state
-}
+    default:
+      return state;
   }
+}
